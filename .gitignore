@@ -1,0 +1,4 @@
+*.pk8
+*.pem
+*.key
+GorillaGuard.remote.local.json
