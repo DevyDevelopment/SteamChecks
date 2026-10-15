@@ -20,9 +20,9 @@ The 1.11.0 collision, movement-asset, swimming, rope, zipline, surface-boost, gl
 
 ## Frame-rate policy
 
-Allowed configured rates are `72`, `80`, `90`, and `120`. A headset report within `±3` Hz is accepted. Measured FPS drops are display-only evidence and never cause a block. An unsupported configured XR refresh is mapped to the nearest allowed value; Gorilla Guard uses Gorilla Tag's own forced-refresh fields/setter and verifies `Application.targetFrameRate` and `Time.fixedDeltaTime` in the overlay and logs.
+Allowed configured rates are `72`, `80`, `90`, and `120`. A headset report within `±3` Hz is accepted. Measured FPS drops are display-only evidence and never cause a block. An unsupported configured XR refresh is mapped to the nearest allowed value; Gorilla Guard uses Gorilla Tag's own refresh setter and caps/verifies `Application.targetFrameRate` in the overlay and logs. `Time.fixedDeltaTime` remains game-controlled.
 
-On PC VR, Unity exposes the headset refresh as read-only. Gorilla Guard can cap and verify game/physics timing but cannot reprogram every headset or SteamVR runtime mode. The overlay uses `LIMITED display -> game FPS` wording when that distinction applies.
+On PC VR, Unity may expose the headset refresh as read-only. Gorilla Guard can request a supported rate and cap the game target but cannot reprogram every headset or SteamVR runtime mode. The overlay uses `LIMITED display -> game FPS` wording when that distinction applies.
 
 ## Intentionally not frozen
 
