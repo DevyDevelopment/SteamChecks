@@ -1,6 +1,6 @@
 # Gorilla Guard
 
-Gorilla Guard is a defensive BepInEx 5 guard plus a user-mode launcher for a local Gorilla Tag installation. Version 1.11.0 runs in exclusive mode: `GorillaGuard.dll` is the only executable allowed under `BepInEx/plugins`, and `GorillaGuard.Preloader.dll` is the only allowed BepInEx patcher. Other executable files are moved recoverably into `BepInEx/quarantine` before ordinary plugin discovery.
+Gorilla Guard is a defensive BepInEx 5 guard plus a user-mode launcher for a local Gorilla Tag installation. Version 1.11.1 runs in exclusive mode: `GorillaGuard.dll` is the only executable allowed under `BepInEx/plugins`, and `GorillaGuard.Preloader.dll` is the only allowed BepInEx patcher. Other executable files are moved recoverably into `BepInEx/quarantine` before ordinary plugin discovery.
 
 The signed release manifest covers the launcher, both guard DLLs, Doorstop bootstrap/configuration, BepInEx core code, the game executable, UnityPlayer, and deterministic hashes of the managed and native game-code trees. It accepts the two observed official native layouts: with or without the optional Discord Game SDK binary; all files that are present must still match exactly, and any addition or modification produces another tree hash and is rejected. The launcher verifies that host baseline before and after acquiring write/delete-denying file locks, starts the game through Steam, watches guarded code directories, monitors native modules, and maintains an authenticated named-pipe heartbeat with the runtime DLL.
 
@@ -11,13 +11,12 @@ The preloader validates a fresh launcher session and its exact executable path b
 - tag-manager `maxTagDistance`: `1.2`
 - tag-manager `maxStiltTagDistance`: `3.2`
 - player maximum arm reach: `1.0`
-- player collision/locomotion constants: unstick distance `1.0`, raycast distance `0.05`, default slide factor `0.03`, slide threshold `0.9`, collision precision `0.995`, teleport threshold `1.0`, friction `1.0`, stick depth `0.01`, secondary jump multiplier `1.0`, ice threshold `0.9`, body interpolation `0.17`, and moving-surface exit threshold `6.0`
-- `Time.timeScale`: `1.0`
-- Unity global gravity: the trusted value observed when the signed runtime starts
 - Forest lower slippery wall `slidePercentageOverride`: `0.55`
 - Forest upper slippery wall `slidePercentageOverride`: `1.0`
 
-Jump multiplier and maximum jump speed are also continuously enforced, but their expected values come from Gorilla Tag's own `GorillaGameManager.LocalPlayerSpeed()` result. They are `1.1` and `6.5` in the base state while legitimate infection/slow/mode changes remain intact. The guard additionally snapshots loaded, signed-game configuration objects after startup and locks their scalar settings: player velocity limits, surface extra-velocity multipliers, swimming parameters, rope/zipline settings, and glider flight tuning. Newly loaded official objects are added during the 20-second audit. Per-frame state such as transforms, hand contacts, velocity, active gravity zones, native size changes, and Photon state is deliberately not frozen.
+Version 1.11.1 removes 1.11.0's broad per-object physics baselines. Those baselines could capture values before Gorilla Tag finished initializing and then fight legitimate game updates, making locomotion unusable. Jump multiplier, maximum jump speed, time scale, and global gravity are now restored only after an unapproved mod/component is actually blocked; otherwise Gorilla Tag retains control of them.
+
+The in-game frame policy accepts only 72, 80, 90, or 120 Hz/FPS targets. A reported headset refresh within 3 Hz of one of those values is accepted. Real measured FPS is displayed but transient or sustained performance drops are not treated as tampering. If the XR display reports an unsupported configured rate, Gorilla Guard asks Gorilla Tag to use the nearest allowed rate and locks `Application.targetFrameRate` plus physics timing to it. The overlay shows `VERIFIED`, `LIMITED`, or `WAITING FOR XR` with configured and measured values.
 
 A lightweight audit runs every 20 seconds and logs to both `BepInEx/LogOutput.log` and `BepInEx/plugins/GorillaGuard.log`. Native-module enumeration and dedicated-file writes run away from Unity's main thread to avoid an audit-frame hitch; the launcher debugger/module check runs every two seconds outside Unity's main thread.
 
@@ -25,7 +24,7 @@ The on-screen panel keeps the three most recent successful enforcement actions. 
 
 See `PHYSICS_LOCKS.md` for the audited member-by-member lock inventory and the intentionally dynamic state that is not frozen.
 
-Version 1.11.0 separates recoverable cheat blocks from fatal trust failures. Disabled plugins/components, detected managed assemblies or Harmony patches, in-use code files, and suspicious late native modules are reported to the launcher while the game remains open. If an in-use file cannot be moved, the launcher attempts to lock it against replacement and continues component, patch, and value enforcement. Because Windows cannot safely unload arbitrary native code once it has already entered the process, this state is logged as containment rather than claimed as complete removal. Invalid signatures, modified protected binaries, missing preloader/runtime authentication, lost heartbeat, watcher boundary failure, and attached debuggers still fail closed.
+Version 1.11.1 separates recoverable cheat blocks from fatal trust failures. Disabled plugins/components, detected managed assemblies or Harmony patches, in-use code files, and suspicious late native modules are reported to the launcher while the game remains open. If an in-use file cannot be moved, the launcher attempts to lock it against replacement and continues component, patch, and value enforcement. Because Windows cannot safely unload arbitrary native code once it has already entered the process, this state is logged as containment rather than claimed as complete removal. Invalid signatures, modified protected binaries, missing preloader/runtime authentication, lost heartbeat, watcher boundary failure, and attached debuggers still fail closed.
 
 ## Build and install
 
@@ -97,7 +96,7 @@ A plugin running inside the game cannot guarantee prevention of native DLL injec
 - rejects redirected/reparse-point code directories instead of following them outside the game folder;
 - quarantines all other executable files under `BepInEx/plugins` and `BepInEx/patchers`, preserving their relative paths for manual restoration;
 - rechecks signed file integrity every five seconds and restores the trusted runtime after an on-disk swap;
-- locks verified static gameplay values and trusted physics configuration baselines, derives legitimate jump values from Gorilla Tag's own game-mode authority, and leaves per-frame movement, surface contact, size-change, gravity-zone, and Photon state under Gorilla Tag's control;
+- locks only the verified tag/reach/slippery-wall values, limits unsupported configured frame timing to 72/80/90/120, and leaves other locomotion, surface contact, size-change, gravity-zone, and Photon state under Gorilla Tag's control;
 - disables unapproved BepInEx plugin components;
 - rejects Unity components created from injected/unapproved assemblies and removes any already present;
 - quarantines newly created executable code files from game code-loading folders while leaving normal logs, configuration, caches, and other game data writable;
