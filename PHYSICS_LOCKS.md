@@ -1,6 +1,6 @@
 # Gorilla Guard physics-lock inventory
 
-This inventory was checked against the installed `Assembly-CSharp.dll` with SHA-256 `91BFCEDB05B466714374A2C0B925E66A260EC6E7205CFDDFD9FE391EAA65F826` (file timestamp 2026-10-08 UTC). It records what Gorilla Guard 1.11.1 locks and why. A new Gorilla Tag build changes the signed host baseline and requires this inventory to be reviewed before a new signed guard release is made.
+This inventory was checked against the installed `Assembly-CSharp.dll` with SHA-256 `91BFCEDB05B466714374A2C0B925E66A260EC6E7205CFDDFD9FE391EAA65F826` (file timestamp 2026-10-08 UTC). It records what Gorilla Guard 1.11.2 locks and why. A new Gorilla Tag build changes the signed host baseline and requires this inventory to be reviewed before a new signed guard release is made.
 
 ## Fixed values
 

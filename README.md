@@ -1,6 +1,6 @@
 # Gorilla Guard
 
-Gorilla Guard is a defensive BepInEx 5 guard plus a user-mode launcher for a local Gorilla Tag installation. Version 1.11.1 runs in exclusive mode: `GorillaGuard.dll` is the only executable allowed under `BepInEx/plugins`, and `GorillaGuard.Preloader.dll` is the only allowed BepInEx patcher. Other executable files are moved recoverably into `BepInEx/quarantine` before ordinary plugin discovery.
+Gorilla Guard is a defensive BepInEx 5 guard plus a user-mode launcher for a local Gorilla Tag installation. Version 1.11.2 runs in exclusive mode: `GorillaGuard.dll` is the only executable allowed under `BepInEx/plugins`, and `GorillaGuard.Preloader.dll` is the only allowed BepInEx patcher. Other executable files are moved recoverably into `BepInEx/quarantine` before ordinary plugin discovery.
 
 The signed release manifest covers the launcher, both guard DLLs, Doorstop bootstrap/configuration, BepInEx core code, the game executable, UnityPlayer, and deterministic hashes of the managed and native game-code trees. It accepts the two observed official native layouts: with or without the optional Discord Game SDK binary; all files that are present must still match exactly, and any addition or modification produces another tree hash and is rejected. The launcher verifies that host baseline before and after acquiring write/delete-denying file locks, starts the game through Steam, watches guarded code directories, monitors native modules, and maintains an authenticated named-pipe heartbeat with the runtime DLL.
 
@@ -48,6 +48,10 @@ The complete signed ZIP remains available for offline/manual installation. Extra
 3. makes a recoverable backup of an existing Gorilla Guard installation;
 4. installs and verifies the launcher, runtime, preloader, BepInEx core, Doorstop bootstrap/configuration, manifest, and signature; and
 5. starts the installed launcher, which starts Gorilla Tag through Steam.
+
+Version 1.11.2 discovers Steam and Gorilla Tag without requiring a typed path. It checks current-user and machine-wide 32/64-bit Steam registration, a running Steam client, the Gorilla Tag app registration, both old and new `libraryfolders.vdf` formats, and conventional Steam/SteamLibrary folders on ready local drives. It identifies Gorilla Tag by Steam app ID `1533390`, so a non-default install folder is supported. If `steam.exe` is not directly readable after installation, the launcher uses Windows' registered `steam://` handler. Run `GorillaGuard.Launcher.exe --diagnose-steam` from an extracted signed package for a read-only report of every discovered client/library and the selected game folder.
+
+An installation or launch failure now stays visible in a Windows error dialog and is also written to `BepInEx/GorillaGuard.Launcher.log`, including a bounded list of the Steam locations that were checked.
 
 Afterward, run the installed `GorillaGuard.Launcher.exe` rather than Steam's Play button. `--install-only` installs without starting the game, `--verify-package` verifies an extracted package, and `--self-test` checks Windows file-lock, debugger-query, job-object, and PID-bound pipe behavior without starting Gorilla Tag.
 
